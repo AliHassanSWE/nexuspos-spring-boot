@@ -3,55 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusPOS Terminal</title>
+    <title>NexusPOS | Professional Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
-        .main-container { display: flex; }
-        .inventory-section { width: 65%; padding-right: 20px; }
-        .cart-section { width: 35%; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); height: fit-content; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .product-card { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; }
-        .product-card h4 { margin: 0 0 10px 0; }
-        .price { color: #28a745; font-weight: bold; font-size: 1.2em; }
-        button { background: #007bff; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #0056b3; }
-        hr { border: 1px solid #eee; margin: 20px 0; }
+        :root {
+            --primary: #4361ee;
+            --success: #2ecc71;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #8d99ae;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            --hover-shadow: 0 15px 25px rgba(67, 97, 238, 0.15);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 30px; 
+            background-color: #edf2f4; 
+            color: var(--dark);
+        }
+
+        h2 { color: var(--dark); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 25px; }
+
+        .main-container { display: flex; gap: 30px; }
+        .inventory-section { width: 65%; }
         
-        /* New Styles for Transaction History */
-        .history-section { margin-top: 40px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .receipt-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa; }
-        .receipt-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+        /* Floating Cart Panel */
+        .cart-section { 
+            width: 35%; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: var(--card-shadow); 
+            height: fit-content;
+            position: sticky;
+            top: 30px;
+        }
+
+        /* Product Grid & Card Animations */
+        .product-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .product-card { 
+            background: white; 
+            border: 1px solid #eef0f2; 
+            padding: 20px; 
+            border-radius: 16px; 
+            text-align: center; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: fadeUp 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .product-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: var(--hover-shadow); 
+            border-color: var(--primary);
+        }
+
+        .product-card h4 { margin: 0 0 10px 0; font-size: 1.1em; color: var(--dark); }
+        .stock-badge { background: #eef0f2; color: var(--gray); font-size: 0.8em; padding: 4px 8px; border-radius: 20px; }
+        .price { color: var(--primary); font-weight: 800; font-size: 1.4em; margin: 15px 0; }
+
+        /* Interactive Buttons */
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
+            border-radius: 10px; 
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+        }
+
+        button:hover { background: #3f37c9; transform: scale(1.02); }
+        button:active { transform: scale(0.98); }
+
+        .checkout-btn { 
+            background: var(--success); 
+            font-size: 1.3em; 
+            padding: 15px; 
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        .checkout-btn:hover { background: #27ae60; }
+
+        /* Cart & History Styles */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #eef0f2; }
+        .cart-item-name { font-weight: 600; }
+        .cart-item-price { color: var(--gray); font-weight: 600; }
+        
+        hr { border: none; height: 2px; background: #eef0f2; margin: 20px 0; }
+        
+        .history-section { margin-top: 50px; background: white; padding: 30px; border-radius: 16px; box-shadow: var(--card-shadow); }
+        .receipt-card { 
+            border: 1px solid #eef0f2; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 12px; 
+            background: #fafbfa;
+            border-left: 5px solid var(--primary);
+            animation: fadeIn 0.5s ease-out;
+        }
+        .receipt-header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 15px; border-bottom: 2px solid #eef0f2; padding-bottom: 10px; color: var(--dark); }
+
+        /* Keyframe Animations */
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Staggered animation delays for product cards */
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.15s; }
+        .product-card:nth-child(3) { animation-delay: 0.2s; }
+        .product-card:nth-child(4) { animation-delay: 0.25s; }
+        .product-card:nth-child(5) { animation-delay: 0.3s; }
+        .product-card:nth-child(6) { animation-delay: 0.35s; }
+        .product-card:nth-child(7) { animation-delay: 0.4s; }
+        .product-card:nth-child(8) { animation-delay: 0.45s; }
     </style>
 </head>
 <body>
 
     <div class="main-container">
         <div class="inventory-section">
-            <h2>Point of Sale - Inventory</h2>
+            <h2>📦 Product Inventory</h2>
             <div id="product-grid" class="product-grid">
-                <p>Loading products from Java backend...</p>
+                <p>Loading products...</p>
             </div>
         </div>
 
         <div class="cart-section">
-            <h2>Current Cart</h2>
+            <h2>🛒 Current Order</h2>
             <div id="cart-items">
-                <p>Cart is empty</p>
+                <p style="color: var(--gray); text-align: center;">Scan items to begin</p>
             </div>
             <hr>
-            <h3>Total: $<span id="cart-total">0.00</span></h3>
-            <button onclick="checkout()" style="background: #28a745; font-size: 1.2em;">Checkout & Pay</button>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: var(--gray);">Grand Total</h3>
+                <h2 style="margin: 0; color: var(--dark); font-size: 2em;">$<span id="cart-total">0.00</span></h2>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">Checkout & Pay</button>
         </div>
     </div>
 
-    <!-- New Transaction History Section -->
     <div class="history-section">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Transaction History</h2>
-            <button onclick="loadHistory()" style="width: auto; padding: 10px 20px;">Refresh History</button>
+            <h2>🧾 Transaction Ledger</h2>
+            <button onclick="loadHistory()" style="width: auto; padding: 10px 25px; background: #eef0f2; color: var(--dark);">↻ Refresh</button>
         </div>
         <div id="history-container">
-            <p>No transactions yet. Complete a checkout to see receipts here.</p>
+            <p style="color: var(--gray);">No transactions yet. Complete an order to generate receipts.</p>
         </div>
     </div>
 
@@ -67,9 +181,9 @@
                         productGrid.innerHTML += `
                             <div class="product-card">
                                 <h4>${product.name}</h4>
-                                <p>Barcode: ${product.id} | Stock: ${product.stockQuantity}</p>
-                                <p class="price">$${product.price.toFixed(2)}</p>
-                                <button onclick="addToCart('${product.id}')">Add to Cart</button>
+                                <span class="stock-badge">ID: ${product.id} | Stock: ${product.stockQuantity}</span>
+                                <div class="price">$${product.price.toFixed(2)}</div>
+                                <button onclick="addToCart('${product.id}')">+ Add to Order</button>
                             </div>
                         `;
                     });
@@ -90,16 +204,19 @@
             cartContainer.innerHTML = ''; 
             
             if (!cart.items || cart.items.length === 0) {
-                cartContainer.innerHTML = '<p>Cart is empty</p>';
+                cartContainer.innerHTML = '<p style="color: var(--gray); text-align: center;">Scan items to begin</p>';
                 totalDisplay.innerText = '0.00';
                 return;
             }
 
             cart.items.forEach(item => {
                 cartContainer.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>${item.product.name} (x${item.quantity})</span>
-                        <span>$${item.subtotal.toFixed(2)}</span>
+                    <div class="cart-item">
+                        <div>
+                            <span class="cart-item-name">${item.product.name}</span>
+                            <span style="color: var(--primary); font-weight: bold; margin-left: 10px;">x${item.quantity}</span>
+                        </div>
+                        <span class="cart-item-price">$${item.subtotal.toFixed(2)}</span>
                     </div>
                 `;
             });
@@ -111,15 +228,14 @@
             fetch('/api/cart/checkout', { method: 'POST' })
                 .then(response => response.text())
                 .then(message => {
-                    alert(message);
+                    alert("✅ " + message);
                     fetch('/api/cart').then(res => res.json()).then(cart => refreshCartUI(cart));
                     loadProducts(); 
-                    loadHistory(); // Automatically refresh history after a sale
+                    loadHistory(); 
                 })
                 .catch(error => console.error('Error during checkout:', error));
         }
 
-        // New Function to Load Past Receipts
         function loadHistory() {
             fetch('/api/transactions')
                 .then(response => response.json())
@@ -127,25 +243,23 @@
                     const historyContainer = document.getElementById('history-container');
                     
                     if (transactions.length === 0) {
-                        historyContainer.innerHTML = '<p>No transactions yet.</p>';
+                        historyContainer.innerHTML = '<p style="color: var(--gray);">No transactions yet.</p>';
                         return;
                     }
 
                     historyContainer.innerHTML = '';
                     
-                    // Reverse the array so the newest sales appear at the top
                     transactions.slice().reverse().forEach(tx => {
                         let itemsHtml = '';
                         tx.purchasedItems.forEach(item => {
                             itemsHtml += `
-                                <div style="display: flex; justify-content: space-between; margin-left: 20px;">
-                                    <span>- ${item.product.name} (x${item.quantity})</span>
-                                    <span>$${(item.product.price * item.quantity).toFixed(2)}</span>
+                                <div class="cart-item" style="border: none; padding: 5px 0;">
+                                    <span>${item.product.name} <span style="color: var(--gray);">x${item.quantity}</span></span>
+                                    <span style="font-weight: 600;">$${(item.product.price * item.quantity).toFixed(2)}</span>
                                 </div>
                             `;
                         });
 
-                        // Format the timestamp
                         const date = new Date(tx.timestamp).toLocaleString();
 
                         historyContainer.innerHTML += `
@@ -155,8 +269,8 @@
                                     <span>${date}</span>
                                 </div>
                                 ${itemsHtml}
-                                <div style="text-align: right; margin-top: 10px; font-weight: bold; font-size: 1.1em; color: #28a745;">
-                                    Grand Total: $${tx.grandTotal.toFixed(2)}
+                                <div style="text-align: right; margin-top: 15px; font-weight: 800; font-size: 1.2em; color: var(--success);">
+                                    Total Paid: $${tx.grandTotal.toFixed(2)}
                                 </div>
                             </div>
                         `;
@@ -167,7 +281,7 @@
 
         loadProducts();
         fetch('/api/cart').then(response => response.json()).then(cart => refreshCartUI(cart));
-        loadHistory(); // Load history when page first opens
+        loadHistory();
     </script>
 </body>
 </html>
