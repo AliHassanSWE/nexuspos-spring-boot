@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusPOS Terminal</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
+        .main-container { display: flex; }
+        .inventory-section { width: 65%; padding-right: 20px; }
+        .cart-section { width: 35%; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); height: fit-content; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .product-card { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; }
+        .product-card h4 { margin: 0 0 10px 0; }
+        .price { color: #28a745; font-weight: bold; font-size: 1.2em; }
+        button { background: #007bff; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #0056b3; }
+        hr { border: 1px solid #eee; margin: 20px 0; }
+        
+        /* New Styles for Transaction History */
+        .history-section { margin-top: 40px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .receipt-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa; }
+        .receipt-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="inventory-section">
+            <h2>Point of Sale - Inventory</h2>
+            <div id="product-grid" class="product-grid">
+                <p>Loading products from Java backend...</p>
+            </div>
+        </div>
+
+        <div class="cart-section">
+            <h2>Current Cart</h2>
+            <div id="cart-items">
+                <p>Cart is empty</p>
+            </div>
+            <hr>
+            <h3>Total: $<span id="cart-total">0.00</span></h3>
+            <button onclick="checkout()" style="background: #28a745; font-size: 1.2em;">Checkout & Pay</button>
+        </div>
+    </div>
+
+    <!-- New Transaction History Section -->
+    <div class="history-section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Transaction History</h2>
+            <button onclick="loadHistory()" style="width: auto; padding: 10px 20px;">Refresh History</button>
+        </div>
+        <div id="history-container">
+            <p>No transactions yet. Complete a checkout to see receipts here.</p>
+        </div>
+    </div>
+
+    <script>
+        function loadProducts() {
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(products => {
+                    const productGrid = document.getElementById('product-grid');
+                    productGrid.innerHTML = ''; 
+                    
+                    products.forEach(product => {
+                        productGrid.innerHTML += `
+                            <div class="product-card">
+                                <h4>${product.name}</h4>
+                                <p>Barcode: ${product.id} | Stock: ${product.stockQuantity}</p>
+                                <p class="price">$${product.price.toFixed(2)}</p>
+                                <button onclick="addToCart('${product.id}')">Add to Cart</button>
+                            </div>
+                        `;
+                    });
+                });
+        }
+
+        function addToCart(productId) {
+            fetch(`/api/cart/add/${productId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(updatedCart => refreshCartUI(updatedCart))
+                .catch(error => console.error('Error adding to cart:', error));
+        }
+
+        function refreshCartUI(cart) {
+            const cartContainer = document.getElementById('cart-items');
+            const totalDisplay = document.getElementById('cart-total');
+            
+            cartContainer.innerHTML = ''; 
+            
+            if (!cart.items || cart.items.length === 0) {
+                cartContainer.innerHTML = '<p>Cart is empty</p>';
+                totalDisplay.innerText = '0.00';
+                return;
+            }
+
+            cart.items.forEach(item => {
+                cartContainer.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>${item.product.name} (x${item.quantity})</span>
+                        <span>$${item.subtotal.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            totalDisplay.innerText = cart.cartTotal.toFixed(2);
+        }
+
+        function checkout() {
+            fetch('/api/cart/checkout', { method: 'POST' })
+                .then(response => response.text())
+                .then(message => {
+                    alert(message);
+                    fetch('/api/cart').then(res => res.json()).then(cart => refreshCartUI(cart));
+                    loadProducts(); 
+                    loadHistory(); // Automatically refresh history after a sale
+                })
+                .catch(error => console.error('Error during checkout:', error));
+        }
+
+        // New Function to Load Past Receipts
+        function loadHistory() {
+            fetch('/api/transactions')
+                .then(response => response.json())
+                .then(transactions => {
+                    const historyContainer = document.getElementById('history-container');
+                    
+                    if (transactions.length === 0) {
+                        historyContainer.innerHTML = '<p>No transactions yet.</p>';
+                        return;
+                    }
+
+                    historyContainer.innerHTML = '';
+                    
+                    // Reverse the array so the newest sales appear at the top
+                    transactions.slice().reverse().forEach(tx => {
+                        let itemsHtml = '';
+                        tx.purchasedItems.forEach(item => {
+                            itemsHtml += `
+                                <div style="display: flex; justify-content: space-between; margin-left: 20px;">
+                                    <span>- ${item.product.name} (x${item.quantity})</span>
+                                    <span>$${(item.product.price * item.quantity).toFixed(2)}</span>
+                                </div>
+                            `;
+                        });
+
+                        // Format the timestamp
+                        const date = new Date(tx.timestamp).toLocaleString();
+
+                        historyContainer.innerHTML += `
+                            <div class="receipt-card">
+                                <div class="receipt-header">
+                                    <span>Receipt ID: ${tx.transactionId}</span>
+                                    <span>${date}</span>
+                                </div>
+                                ${itemsHtml}
+                                <div style="text-align: right; margin-top: 10px; font-weight: bold; font-size: 1.1em; color: #28a745;">
+                                    Grand Total: $${tx.grandTotal.toFixed(2)}
+                                </div>
+                            </div>
+                        `;
+                    });
+                })
+                .catch(error => console.error('Error fetching history:', error));
+        }
+
+        loadProducts();
+        fetch('/api/cart').then(response => response.json()).then(cart => refreshCartUI(cart));
+        loadHistory(); // Load history when page first opens
+    </script>
+</body>
+</html>
