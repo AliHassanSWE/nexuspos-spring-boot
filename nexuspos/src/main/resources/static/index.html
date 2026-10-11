@@ -146,6 +146,9 @@
     </aside>
 
     <script>
+       // Global chart variable
+        let salesChartInstance = null;
+
         // --- 1. Dashboard Analytics & Chart ---
         function loadDashboardStats() {
             fetch('/api/dashboard/stats')
@@ -158,6 +161,12 @@
                     document.getElementById('dash-revenue').innerText = '$' + revenue.toFixed(2);
                     document.getElementById('dash-tx-count').innerText = txCount;
                     document.getElementById('dash-avg').innerText = '$' + avgSale.toFixed(2);
+
+                    // Update the chart's final data point (Today) with real backend revenue
+                    if (salesChartInstance) {
+                        salesChartInstance.data.datasets[0].data[6] = revenue;
+                        salesChartInstance.update();
+                    }
 
                     const alertsList = document.getElementById('alerts-list');
                     alertsList.innerHTML = '';
@@ -177,6 +186,39 @@
                 })
                 .catch(err => console.error("Error loading stats", err));
         }
+
+        // Initialize Chart.js with mock history + live "Today" node
+        function initChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [120, 190, 300, 250, 400, 380, 0], // The '0' will be overwritten by live data
+                        borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { beginAtZero: true, border: {display: false} },
+                        x: { grid: {display: false} }
+                    }
+                }
+            });
+        }
+
+        // Initialize Data on Load
+        initChart();
+        loadProducts();
+        fetch('/api/cart').then(r => r.json()).then(c => refreshCartUI(c));
+        loadDashboardStats();
 
         // Initialize Chart.js with mock trend data for the visual
         const ctx = document.getElementById('salesChart').getContext('2d');
