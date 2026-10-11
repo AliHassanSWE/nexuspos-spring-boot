@@ -30,7 +30,13 @@
         .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: white; border-left: 4px solid var(--accent-green); }
 
         /* Center Dashboard Area */
-        .main-dashboard { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
+/* Center Dashboard Area */
+    .main-dashboard { 
+        flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; 
+        animation: popUpScale 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        animation-delay: 0.3s; /* Waits for loader */
+        opacity: 0;
+    }
         .header h1 { margin: 0; font-size: 1.8em; }
         .header p { margin: 5px 0 20px 0; color: var(--text-muted); }
 
@@ -64,7 +70,13 @@
         .badge.danger { background: #fee2e2; color: #991b1b; }
 
         /* Right Quick Sale Panel */
-        .quick-sale { width: 350px; background: var(--card-bg); border-left: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
+/* Right Quick Sale Panel */
+    .quick-sale { 
+        width: 350px; background: var(--card-bg); border-left: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; 
+        animation: popUpScale 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        animation-delay: 0.45s; /* Pops up slightly after the dashboard */
+        opacity: 0;
+    }
         .search-bar { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: inherit; outline: none; box-sizing: border-box; }
         .mini-product-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; }
         .mini-product { border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.9em; transition: 0.2s; }
@@ -136,12 +148,18 @@
         }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* 3. Stagger Dashboard Cards */
-        .stat-card { animation: slideUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+       /* 3. Stagger Dashboard Cards (Left to Right Cascade) */
+        .stat-card { 
+            animation: slideUp 0.8s ease-out forwards; 
+            opacity: 0; 
+            transform: translateY(30px); 
+        }
+        
+        /* Delays start after the main dashboard pops in */
+        .stat-card:nth-child(1) { animation-delay: 0.8s; }
+        .stat-card:nth-child(2) { animation-delay: 0.95s; }
+        .stat-card:nth-child(3) { animation-delay: 1.10s; }
+        .stat-card:nth-child(4) { animation-delay: 1.25s; }
         /* 1. Custom Themed Scrollbars */
      ::-webkit-scrollbar { width: 6px; height: 6px; }
      ::-webkit-scrollbar-track { background: transparent; }
@@ -150,6 +168,38 @@
 
      /* 2. Sidebar Icon Spacing */
      .nav-item i { width: 20px; text-align: center; margin-right: 12px; font-size: 1.1em; }
+     /* Full Application Pop-Up Effect */
+    @keyframes popUpScale {
+        0% { opacity: 0; transform: scale(0.92); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+/* Sidebar Staggered Entrance Animation */
+        @keyframes slideInSidebar {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Increased animation duration to 0.8s */
+        .sidebar h2 { 
+            animation: slideInSidebar 0.8s ease-out forwards; 
+            animation-delay: 0.5s; /* Starts right as the loader fades */
+            opacity: 0; 
+        }
+        
+        .sidebar .nav-item { 
+            animation: slideInSidebar 0.8s ease-out forwards; 
+            opacity: 0; 
+        }
+        
+        /* Increased the gap between each item to 0.15s for a visible cascading effect */
+        .sidebar .nav-item:nth-child(2) { animation-delay: 0.65s; }  /* Dashboard */
+        .sidebar .nav-item:nth-child(3) { animation-delay: 0.80s; }  /* Sales */
+        .sidebar .nav-item:nth-child(4) { animation-delay: 0.95s; }  /* Products */
+        .sidebar .nav-item:nth-child(5) { animation-delay: 1.10s; }  /* Customers */
+        .sidebar .nav-item:nth-child(6) { animation-delay: 1.25s; }  /* Reports */
+        .sidebar .nav-item:nth-child(7) { animation-delay: 1.40s; }  /* Settings */
+        .sidebar .nav-item:nth-child(8) { animation-delay: 1.55s; }  /* About */
+    
     </style>
 </head>
 <body>
@@ -506,7 +556,18 @@ let isAdmin = true;
                         fill: true
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, border: {display: false} }, x: { grid: {display: false} } } }
+options: {
+                    responsive: true,
+                    animation: {
+                        duration: 2000, // 2 seconds to draw the line
+                        easing: 'easeOutQuart' // Smooth deceleration
+                    },
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { beginAtZero: true, border: {display: false} },
+                        x: { grid: {display: false} }
+                    }
+                }
             });
         }
 
