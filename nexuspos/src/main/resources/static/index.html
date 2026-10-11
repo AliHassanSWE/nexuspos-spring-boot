@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SupaPOS Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- Chart.js Library for the Sales Graph -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -29,105 +28,203 @@
         .nav-item { padding: 15px 20px; color: #a8d5cd; text-decoration: none; font-weight: 600; display: block; transition: 0.2s; cursor: pointer; }
         .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: white; border-left: 4px solid var(--accent-green); }
 
-        /* Center Dashboard */
-        .main-dashboard { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        /* Center Dashboard Area */
+        .main-dashboard { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
         .header h1 { margin: 0; font-size: 1.8em; }
         .header p { margin: 5px 0 20px 0; color: var(--text-muted); }
 
-        /* KPI Stats Row */
+        /* Tab Views (SPA Logic) */
+        .view-section { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* KPI Stats & Charts */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .stat-card { background: var(--card-bg); padding: 20px; border-radius: var(--border-radius); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .stat-title { color: var(--text-muted); font-size: 0.9em; font-weight: 600; margin-bottom: 10px; }
         .stat-value { font-size: 1.8em; font-weight: 800; }
-
-        /* Chart & Alerts Row */
         .dashboard-row { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 10px; }
         .chart-container, .alerts-container { background: var(--card-bg); padding: 20px; border-radius: var(--border-radius); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .section-title { font-size: 1.1em; font-weight: 800; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-
         .alert-item { display: flex; justify-content: space-between; padding: 12px; background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; margin-bottom: 10px; }
         .alert-item.warning { background: #fffff0; border-color: #fefcbf; }
         .alert-name { font-weight: 600; font-size: 0.9em; }
         .alert-stock { color: var(--danger-red); font-size: 0.85em; font-weight: 800; }
         .alert-stock.warning { color: #d69e2e; }
 
+        /* New Data Tables */
+        .data-table-container { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .data-table th { background: #f8fafc; color: var(--text-muted); font-weight: 600; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-table tr:hover { background: #f1f5f9; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 800; }
+        .badge.good { background: #dcfce7; color: #166534; }
+        .badge.danger { background: #fee2e2; color: #991b1b; }
+
         /* Right Quick Sale Panel */
         .quick-sale { width: 350px; background: var(--card-bg); border-left: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
         .search-bar { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: inherit; outline: none; box-sizing: border-box; }
-        
         .mini-product-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; }
         .mini-product { border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.9em; transition: 0.2s; }
         .mini-product:hover { border-color: var(--accent-green); background: #f0fdf4; }
         .mini-price { font-weight: 800; color: var(--sidebar-bg); }
-
         .cart-container { flex: 1; overflow-y: auto; border-top: 1px solid #e2e8f0; padding-top: 15px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.9em; }
-        
         .totals { border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: auto; }
         .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9em; }
         .grand-total { font-size: 1.4em; font-weight: 800; color: var(--text-dark); margin: 10px 0; display: flex; justify-content: space-between; }
-        
         .btn-checkout { background: var(--accent-green); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: 800; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
         .btn-checkout:hover { background: #27ae60; }
     </style>
 </head>
 <body>
 
-    <!-- Left Sidebar -->
+    <!-- Left Sidebar with click events -->
     <nav class="sidebar">
         <h2>SupaPOS</h2>
-        <div class="nav-item active">Dashboard</div>
-        <div class="nav-item">Sales</div>
-        <div class="nav-item">Products</div>
-        <div class="nav-item">Customers</div>
-        <div class="nav-item">Reports</div>
-        <div class="nav-item">Settings</div>
+        <div class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</div>
+        <div class="nav-item" onclick="switchTab('sales', this)">Sales</div>
+        <div class="nav-item" onclick="switchTab('products', this)">Products</div>
+        <div class="nav-item" onclick="switchTab('customers', this)">Customers</div>
+        <div class="nav-item" onclick="switchTab('reports', this)">Reports</div>
+        <div class="nav-item" onclick="switchTab('settings', this)">Settings</div>
     </nav>
 
-    <!-- Center Dashboard -->
+    <!-- Center Content Area -->
     <main class="main-dashboard">
-        <div class="header">
-            <h1>Today's Overview</h1>
-            <p>Welcome back! Here's what's happening today.</p>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-title">Total Revenue</div>
-                <div class="stat-value" id="dash-revenue">$0.00</div>
+        
+        <!-- 1. DASHBOARD TAB -->
+        <div id="view-dashboard" class="view-section active">
+            <div class="header">
+                <h1>Today's Overview</h1>
+                <p>Welcome back! Here's what's happening today.</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-title">Transactions</div>
-                <div class="stat-value" id="dash-tx-count">0</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Revenue</div>
+                    <div class="stat-value" id="dash-revenue">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Transactions</div>
+                    <div class="stat-value" id="dash-tx-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Avg. Sale</div>
+                    <div class="stat-value" id="dash-avg">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Customers</div>
+                    <div class="stat-value">Active</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-title">Avg. Sale</div>
-                <div class="stat-value" id="dash-avg">$0.00</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Customers</div>
-                <div class="stat-value">Active</div>
-            </div>
-        </div>
-
-        <div class="dashboard-row">
-            <div class="chart-container">
-                <div class="section-title">Sales Overview</div>
-                <canvas id="salesChart" height="100"></canvas>
-            </div>
-            <div class="alerts-container">
-                <div class="section-title">Inventory Alerts <span style="color: var(--accent-green); font-size: 0.8em; font-weight: 400; cursor: pointer;">Manage</span></div>
-                <div id="alerts-list">
-                    <p style="color: var(--text-muted); font-size: 0.9em;">Loading alerts...</p>
+            <div class="dashboard-row">
+                <div class="chart-container">
+                    <div class="section-title">Sales Overview</div>
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
+                <div class="alerts-container">
+                    <div class="section-title">Inventory Alerts</div>
+                    <div id="alerts-list">
+                        <p style="color: var(--text-muted); font-size: 0.9em;">Loading alerts...</p>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- 2. SALES TAB -->
+        <div id="view-sales" class="view-section">
+            <div class="header">
+                <h1>Transaction History</h1>
+                <p>View all past sales and receipts.</p>
+            </div>
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Receipt ID</th>
+                            <th>Date & Time</th>
+                            <th>Total Items</th>
+                            <th>Grand Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sales-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. PRODUCTS TAB -->
+        <div id="view-products" class="view-section">
+            <div class="header">
+                <h1>Product Inventory</h1>
+                <p>Manage your store's items and stock levels.</p>
+            </div>
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Barcode ID</th>
+                            <th>Product Name</th>
+                            <th>Stock Status</th>
+                            <th>Unit Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. CUSTOMERS TAB -->
+        <div id="view-customers" class="view-section">
+            <div class="header">
+                <h1>Customer Directory</h1>
+                <p>Track loyal shoppers and purchase history.</p>
+            </div>
+            <div style="background: white; padding: 40px; text-align: center; border-radius: 12px; color: var(--text-muted);">
+                <h2 style="color: var(--text-dark);">🚀 Coming in Version 2.0</h2>
+                <p>Customer accounts and rewards programs will be enabled in the next update.</p>
+            </div>
+        </div>
+
+        <!-- 5. REPORTS TAB -->
+        <div id="view-reports" class="view-section">
+            <div class="header">
+                <h1>Advanced Analytics</h1>
+                <p>Generate detailed tax and revenue reports.</p>
+            </div>
+            <div style="background: white; padding: 40px; text-align: center; border-radius: 12px; color: var(--text-muted);">
+                <h2 style="color: var(--text-dark);">📄 Reports Engine</h2>
+                <p>PDF Export and Custom Date Ranges will appear here.</p>
+            </div>
+        </div>
+
+        <!-- 6. SETTINGS TAB -->
+        <div id="view-settings" class="view-section">
+            <div class="header">
+                <h1>System Settings</h1>
+                <p>Manage application preferences.</p>
+            </div>
+            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                <h3 style="margin-top: 0;">Account Profile</h3>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">Logged in as: <strong style="color: var(--text-dark);">Admin (Manager Role)</strong></p>
+                <div style="display: flex; gap: 10px;">
+                    <button style="background: var(--text-dark); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Edit Profile</button>
+                    <button onclick="alert('You have successfully logged out.')" style="background: #fee2e2; color: #991b1b; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Log Out</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <!-- Right Quick Sale Panel -->
+    <!-- Right Quick Sale Panel (Always Visible) -->
     <aside class="quick-sale">
         <div style="font-weight: 800; margin-bottom: 15px;">Quick Sale</div>
-<input type="text" id="search-input" class="search-bar" placeholder="🔍 Search products..." onkeyup="filterProducts()">        
+        <input type="text" id="search-input" class="search-bar" placeholder="🔍 Search products..." onkeyup="filterProducts()">
+        
         <div class="mini-product-list" id="mini-products">
             <!-- Products loaded via JS -->
         </div>
@@ -146,10 +243,70 @@
     </aside>
 
     <script>
-       // Global chart variable
         let salesChartInstance = null;
 
-        // --- 1. Dashboard Analytics & Chart ---
+        // --- Tab Switching Logic (SPA) ---
+        function switchTab(tabId, element) {
+            // Highlight sidebar tab
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            // Hide all views and show selected one
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
+
+            // Fetch fresh data when tab is opened
+            if(tabId === 'sales') loadSalesHistory();
+            if(tabId === 'products') loadProductTable();
+        }
+
+        // --- Data Loaders for New Tabs ---
+        function loadSalesHistory() {
+            fetch('/api/transactions')
+                .then(res => res.json())
+                .then(txs => {
+                    const tbody = document.getElementById('sales-table-body');
+                    tbody.innerHTML = '';
+                    if(txs.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No transactions found.</td></tr>';
+                        return;
+                    }
+                    txs.slice().reverse().forEach(tx => {
+                        const date = new Date(tx.timestamp).toLocaleString();
+                        const itemCount = tx.purchasedItems.reduce((sum, item) => sum + item.quantity, 0);
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-family: monospace; color: var(--text-muted);">${tx.transactionId}</td>
+                                <td>${date}</td>
+                                <td>${itemCount} items</td>
+                                <td style="font-weight: 800; color: var(--accent-green);">$${tx.grandTotal.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        function loadProductTable() {
+            fetch('/api/products')
+                .then(res => res.json())
+                .then(products => {
+                    const tbody = document.getElementById('products-table-body');
+                    tbody.innerHTML = '';
+                    products.forEach(p => {
+                        const badgeClass = p.stockQuantity < 10 ? 'badge danger' : 'badge good';
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-family: monospace; color: var(--text-muted);">${p.id}</td>
+                                <td style="font-weight: 600;">${p.name}</td>
+                                <td><span class="${badgeClass}">${p.stockQuantity} in stock</span></td>
+                                <td style="font-weight: 600;">$${p.price.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        // --- Existing POS Functions ---
         function loadDashboardStats() {
             fetch('/api/dashboard/stats')
                 .then(res => res.json())
@@ -162,7 +319,6 @@
                     document.getElementById('dash-tx-count').innerText = txCount;
                     document.getElementById('dash-avg').innerText = '$' + avgSale.toFixed(2);
 
-                    // Update the chart's final data point (Today) with real backend revenue
                     if (salesChartInstance) {
                         salesChartInstance.data.datasets[0].data[6] = revenue;
                         salesChartInstance.update();
@@ -183,11 +339,9 @@
                             `;
                         });
                     }
-                })
-                .catch(err => console.error("Error loading stats", err));
+                });
         }
 
-        // Initialize Chart.js with mock history + live "Today" node
         function initChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             salesChartInstance = new Chart(ctx, {
@@ -196,57 +350,18 @@
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
                     datasets: [{
                         label: 'Revenue',
-                        data: [120, 190, 300, 250, 400, 380, 0], // The '0' will be overwritten by live data
+                        data: [120, 190, 300, 250, 400, 380, 0],
                         borderColor: '#2ecc71',
                         backgroundColor: 'rgba(46, 204, 113, 0.1)',
                         tension: 0.4,
                         fill: true
                     }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { beginAtZero: true, border: {display: false} },
-                        x: { grid: {display: false} }
-                    }
-                }
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, border: {display: false} }, x: { grid: {display: false} } } }
             });
         }
 
-        // Initialize Data on Load
-        initChart();
-        loadProducts();
-        fetch('/api/cart').then(r => r.json()).then(c => refreshCartUI(c));
-        loadDashboardStats();
-
-        // Initialize Chart.js with mock trend data for the visual
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: [120, 190, 300, 250, 400, 380, 500],
-                    borderColor: '#2ecc71',
-                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { beginAtZero: true, border: {display: false} },
-                    x: { grid: {display: false} }
-                }
-            }
-        });
-
-        // --- 2. POS Functions (Moved to Right Panel) ---
-        function loadProducts() {
+        function loadProductsForCart() {
             fetch('/api/products')
                 .then(res => res.json())
                 .then(products => {
@@ -264,9 +379,7 @@
         }
 
         function addToCart(productId) {
-            fetch(`/api/cart/add/${productId}`, { method: 'POST' })
-                .then(res => res.json())
-                .then(cart => refreshCartUI(cart));
+            fetch(`/api/cart/add/${productId}`, { method: 'POST' }).then(res => res.json()).then(cart => refreshCartUI(cart));
         }
 
         function refreshCartUI(cart) {
@@ -293,34 +406,34 @@
             document.getElementById('cart-subtotal').innerText = '$' + cart.cartTotal.toFixed(2);
             document.getElementById('cart-total').innerText = '$' + cart.cartTotal.toFixed(2);
         }
-function filterProducts() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const productCards = document.getElementsByClassName('mini-product');
-            
-            for (let i = 0; i < productCards.length; i++) {
-                // The product name is the first div inside the mini-product card
-                const productName = productCards[i].firstElementChild.innerText.toLowerCase();
-                
-                if (productName.includes(query)) {
-                    productCards[i].style.display = "block"; // Show match
-                } else {
-                    productCards[i].style.display = "none";  // Hide non-match
-                }
-            }
-        }
+
         function checkout() {
             fetch('/api/cart/checkout', { method: 'POST' })
                 .then(res => res.text())
                 .then(msg => {
                     alert("✅ " + msg);
                     fetch('/api/cart').then(r => r.json()).then(c => refreshCartUI(c));
-                    loadProducts(); 
-                    loadDashboardStats(); // Refresh dashboard numbers after sale
+                    loadProductsForCart(); 
+                    loadDashboardStats(); 
+                    // Refresh data tables if they are currently open
+                    if (document.getElementById('view-products').classList.contains('active')) loadProductTable();
+                    if (document.getElementById('view-sales').classList.contains('active')) loadSalesHistory();
                 });
         }
 
+        function filterProducts() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const productCards = document.getElementsByClassName('mini-product');
+            for (let i = 0; i < productCards.length; i++) {
+                const productName = productCards[i].firstElementChild.innerText.toLowerCase();
+                if (productName.includes(query)) productCards[i].style.display = "block";
+                else productCards[i].style.display = "none";
+            }
+        }
+
         // Initialize Data on Load
-        loadProducts();
+        initChart();
+        loadProductsForCart();
         fetch('/api/cart').then(r => r.json()).then(c => refreshCartUI(c));
         loadDashboardStats();
     </script>

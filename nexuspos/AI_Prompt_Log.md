@@ -29,3 +29,9 @@
 ## 5. Debugging & Issue Resolution
 **Prompt Used:** *"MySQL keeps automatically stopping in XAMPP after a few seconds and Java throws a 'Unable to determine Dialect' error. How do I fix this?"*
 **AI Assistance:** The AI identified a corrupted MySQL data folder caused by a crashed process. It provided step-by-step instructions to replace the broken XAMPP `/data` directory with the clean `/backup` directory, restoring database stability and allowing Hibernate to rebuild the schemas successfully.
+## 6. Enterprise UI & Analytics Conversion
+**Prompt Used:** *"I want to convert my POS project like this picture I attached. Means I want a dashboard, a graph, more options to edit, and stock."*
+**AI Assistance:** 
+* **Backend Aggregation:** The AI guided the creation of a `DashboardController` and custom JPQL queries (`@Query("SELECT COALESCE(SUM(t.grandTotal), 0) FROM Transaction t")`) to aggregate real-time revenue and count low-stock items across the entire database.
+* **Frontend Overhaul:** The AI provided the CSS Grid and Flexbox structural code to convert the application into a 3-column enterprise layout without breaking the existing shopping cart logic.
+* **Data Visualization:** The AI integrated `Chart.js`, writing JavaScript fetch promises to pull the calculated SQL statistics and render a dynamic trend line for the Sales Overview widget.
