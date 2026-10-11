@@ -20,8 +20,17 @@
             font-family: 'Inter', sans-serif; 
             margin: 0; 
             padding: 30px; 
-            background-color: #edf2f4; 
+            /* Subtle animated gradient background */
+            background: linear-gradient(-45deg, #edf2f4, #e2eafc, #edf2f4);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: var(--dark);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         h2 { color: var(--dark); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 25px; }
@@ -29,7 +38,6 @@
         .main-container { display: flex; gap: 30px; }
         .inventory-section { width: 65%; }
         
-        /* Floating Cart Panel */
         .cart-section { 
             width: 35%; 
             background: white; 
@@ -41,7 +49,6 @@
             top: 30px;
         }
 
-        /* Product Grid & Card Animations */
         .product-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
@@ -55,9 +62,9 @@
             border-radius: 16px; 
             text-align: center; 
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            animation: fadeUp 0.5s ease-out forwards;
+            animation: fadeUp 0.6s ease-out forwards;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
         }
 
         .product-card:hover { 
@@ -70,7 +77,6 @@
         .stock-badge { background: #eef0f2; color: var(--gray); font-size: 0.8em; padding: 4px 8px; border-radius: 20px; }
         .price { color: var(--primary); font-weight: 800; font-size: 1.4em; margin: 15px 0; }
 
-        /* Interactive Buttons */
         button { 
             background: var(--primary); 
             color: white; 
@@ -81,11 +87,30 @@
             font-weight: 600;
             font-size: 1em;
             cursor: pointer; 
-            transition: all 0.2s ease; 
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        button:hover { background: #3f37c9; transform: scale(1.02); }
-        button:active { transform: scale(0.98); }
+        /* Shine animation for buttons */
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255,255,255,0.3);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+        }
+
+        button:hover::after {
+            left: 120%;
+        }
+
+        button:hover { background: #3f37c9; transform: scale(1.03); }
+        button:active { transform: scale(0.95); }
 
         .checkout-btn { 
             background: var(--success); 
@@ -96,8 +121,21 @@
         }
         .checkout-btn:hover { background: #27ae60; }
 
-        /* Cart & History Styles */
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #eef0f2; }
+        .cart-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 12px 0; 
+            border-bottom: 1px dashed #eef0f2; 
+        }
+
+        /* Slide in animation for new cart items */
+        .cart-item-animated {
+            animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
         .cart-item-name { font-weight: 600; }
         .cart-item-price { color: var(--gray); font-weight: 600; }
         
@@ -115,7 +153,11 @@
         }
         .receipt-header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 15px; border-bottom: 2px solid #eef0f2; padding-bottom: 10px; color: var(--dark); }
 
-        /* Keyframe Animations */
+        /* Price Pop Animation */
+        .price-pop {
+            animation: pop 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
         @keyframes fadeUp {
             to { opacity: 1; transform: translateY(0); }
         }
@@ -123,8 +165,15 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); color: var(--success); }
+            100% { transform: scale(1); }
+        }
 
-        /* Staggered animation delays for product cards */
         .product-card:nth-child(1) { animation-delay: 0.1s; }
         .product-card:nth-child(2) { animation-delay: 0.15s; }
         .product-card:nth-child(3) { animation-delay: 0.2s; }
@@ -153,7 +202,9 @@
             <hr>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin: 0; color: var(--gray);">Grand Total</h3>
-                <h2 style="margin: 0; color: var(--dark); font-size: 2em;">$<span id="cart-total">0.00</span></h2>
+                <h2 style="margin: 0; color: var(--dark); font-size: 2em; display: inline-block;" id="total-container">
+                    $<span id="cart-total">0.00</span>
+                </h2>
             </div>
             <button class="checkout-btn" onclick="checkout()">Checkout & Pay</button>
         </div>
@@ -165,11 +216,13 @@
             <button onclick="loadHistory()" style="width: auto; padding: 10px 25px; background: #eef0f2; color: var(--dark);">↻ Refresh</button>
         </div>
         <div id="history-container">
-            <p style="color: var(--gray);">No transactions yet. Complete an order to generate receipts.</p>
+            <p style="color: var(--gray);">No transactions yet.</p>
         </div>
     </div>
 
     <script>
+        let currentTotal = 0;
+
         function loadProducts() {
             fetch('/api/products')
                 .then(response => response.json())
@@ -200,18 +253,22 @@
         function refreshCartUI(cart) {
             const cartContainer = document.getElementById('cart-items');
             const totalDisplay = document.getElementById('cart-total');
+            const totalContainer = document.getElementById('total-container');
             
             cartContainer.innerHTML = ''; 
             
             if (!cart.items || cart.items.length === 0) {
                 cartContainer.innerHTML = '<p style="color: var(--gray); text-align: center;">Scan items to begin</p>';
                 totalDisplay.innerText = '0.00';
+                currentTotal = 0;
                 return;
             }
 
-            cart.items.forEach(item => {
+            cart.items.forEach((item, index) => {
+                // Add staggered animation delay based on index
+                const delay = index * 0.05;
                 cartContainer.innerHTML += `
-                    <div class="cart-item">
+                    <div class="cart-item cart-item-animated" style="animation-delay: ${delay}s">
                         <div>
                             <span class="cart-item-name">${item.product.name}</span>
                             <span style="color: var(--primary); font-weight: bold; margin-left: 10px;">x${item.quantity}</span>
@@ -220,6 +277,14 @@
                     </div>
                 `;
             });
+
+            // Only play the pop animation if the total actually changed
+            if (currentTotal !== cart.cartTotal) {
+                totalContainer.classList.remove('price-pop');
+                void totalContainer.offsetWidth; // Trigger DOM reflow to restart animation
+                totalContainer.classList.add('price-pop');
+                currentTotal = cart.cartTotal;
+            }
 
             totalDisplay.innerText = cart.cartTotal.toFixed(2);
         }
