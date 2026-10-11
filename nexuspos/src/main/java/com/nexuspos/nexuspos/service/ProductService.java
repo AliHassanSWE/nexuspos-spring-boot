@@ -38,7 +38,16 @@ public class ProductService {
             productRepository.save(new Product("107", "Aluminum Laptop Stand", 34.50, 45));
             productRepository.save(new Product("108", "1080p HD Webcam", 59.99, 25));
         }
-
+        // Safely append 7 new products without overwriting existing data
+        if (!productRepository.existsById("109")) {
+            productRepository.save(new Product("109", "Bluetooth Speaker", 45.00, 40));
+            productRepository.save(new Product("110", "HD Web Camera", 59.99, 15));
+            productRepository.save(new Product("111", "Laptop Sleeve", 24.50, 60));
+            productRepository.save(new Product("112", "Wireless Earbuds", 79.99, 35));
+            productRepository.save(new Product("113", "Gaming Mousepad", 14.99, 80));
+            productRepository.save(new Product("114", "USB Flash Drive 64GB", 18.50, 100));
+            productRepository.save(new Product("115", "Smartphone Stand", 12.99, 50));
+        }
         // 2. Load all products from MySQL into the HashMap cache for O(1) search speeds
         List<Product> allProducts = productRepository.findAll();
         for (Product product : allProducts) {
