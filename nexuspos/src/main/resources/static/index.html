@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NexusPOS Dashboard</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -141,6 +142,14 @@
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
         .stat-card:nth-child(3) { animation-delay: 0.3s; }
         .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        /* 1. Custom Themed Scrollbars */
+     ::-webkit-scrollbar { width: 6px; height: 6px; }
+     ::-webkit-scrollbar-track { background: transparent; }
+     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+     ::-webkit-scrollbar-thumb:hover { background: var(--sidebar-bg); }
+
+     /* 2. Sidebar Icon Spacing */
+     .nav-item i { width: 20px; text-align: center; margin-right: 12px; font-size: 1.1em; }
     </style>
 </head>
 <body>
@@ -152,16 +161,15 @@
     </div>
 
     <!-- Left Sidebar with click events -->
-    <nav class="sidebar">
-<h2>NexusPOS</h2>
-        <div class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</div>
-        <div class="nav-item" onclick="switchTab('sales', this)">Sales</div>
-        <div class="nav-item" onclick="switchTab('products', this)">Products</div>
-        <div class="nav-item" onclick="switchTab('customers', this)">Customers</div>
-        <div class="nav-item" onclick="switchTab('reports', this)">Reports</div>
-        <div class="nav-item" onclick="switchTab('settings', this)">Settings</div>
-        <div class="nav-item" onclick="switchTab('about', this)">About</div>
-    </nav>
+ <nav class="sidebar">
+        <h2><i class="fas fa-box-open" style="margin-right: 8px;"></i>NexusPOS</h2>
+        <div id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+        <div id="nav-sales" class="nav-item" onclick="switchTab('sales', this)"><i class="fas fa-receipt"></i> Sales</div>
+        <div id="nav-products" class="nav-item" onclick="switchTab('products', this)"><i class="fas fa-tags"></i> Products</div>
+        <div id="nav-customers" class="nav-item" onclick="switchTab('customers', this)"><i class="fas fa-users"></i> Customers</div>
+        <div id="nav-reports" class="nav-item" onclick="switchTab('reports', this)"><i class="fas fa-file-invoice-dollar"></i> Reports</div>
+        <div id="nav-settings" class="nav-item" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> Settings</div>
+        <div id="nav-about" class="nav-item" onclick="switchTab('about', this)"><i class="fas fa-info-circle"></i> About</div>
     </nav>
 
     <!-- Center Content Area -->
@@ -277,20 +285,22 @@
         </div>
 
         <!-- 6. SETTINGS TAB -->
-        <div id="view-settings" class="view-section">
-            <div class="header">
-                <h1>System Settings</h1>
-                <p>Manage application preferences.</p>
-            </div>
-            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0;">Account Profile</h3>
-<p style="color: var(--text-muted); margin-bottom: 25px;">Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong></p>
-                <div style="display: flex; gap: 10px;">
-                    <button style="background: var(--text-dark); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Edit Profile</button>
-                    <button onclick="alert('You have successfully logged out.')" style="background: #fee2e2; color: #991b1b; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Log Out</button>
-                </div>
+    <div id="view-settings" class="view-section">
+        <div class="header">
+            <h1>System Settings</h1>
+            <p>Manage application preferences.</p>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+            <h3 style="margin-top: 0;">Account Profile</h3>
+            <p id="profile-text" style="color: var(--text-muted); margin-bottom: 25px;">Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong></p>
+            <div style="display: flex; gap: 10px;">
+                <button id="role-btn" onclick="toggleRole()" style="background: var(--warning-yellow); color: var(--text-dark); padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Switch to Cashier</button>
+                <button style="background: var(--text-dark); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Edit Profile</button>
+                <button onclick="alert('You have successfully logged out.')" style="background: #fee2e2; color: #991b1b; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Log Out</button>
             </div>
         </div>
+    </div>
 <!-- 7. ABOUT TAB -->
         <div id="view-about" class="view-section">
             <div class="header">
@@ -334,8 +344,11 @@
 
         <div style="font-weight: 800; margin: 15px 0;">Cart Items</div>
         <div class="cart-container" id="cart-items">
-            <p style="color: var(--text-muted); text-align: center; font-size: 0.9em;">Cart is empty</p>
-        </div>
+         <div style="text-align: center; color: var(--text-muted); margin-top: 30px;">
+             <i class="fas fa-shopping-basket" style="font-size: 3em; color: #e2e8f0; margin-bottom: 15px;"></i>
+             <p style="margin: 0; font-size: 0.9em;">Cart is currently empty</p>
+         </div>
+     </div>
 
         <div class="totals">
             <div class="total-row"><span>Subtotal</span> <span id="cart-subtotal">$0.00</span></div>
@@ -370,7 +383,31 @@
             if(tabId === 'sales') loadSalesHistory();
             if(tabId === 'products') loadProductTable();
         }
+let isAdmin = true;
 
+    function toggleRole() {
+        isAdmin = !isAdmin;
+        const profileText = document.getElementById('profile-text');
+        const roleBtn = document.getElementById('role-btn');
+        
+        const productsTab = document.getElementById('nav-products');
+        const reportsTab = document.getElementById('nav-reports');
+        
+        if(isAdmin) {
+            profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong>';
+            roleBtn.innerText = 'Switch to Cashier';
+            productsTab.style.display = 'block';
+            reportsTab.style.display = 'block';
+        } else {
+            profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Guest (Cashier)</strong>';
+            roleBtn.innerText = 'Switch to Admin';
+            productsTab.style.display = 'none';
+            reportsTab.style.display = 'none';
+            
+            // If they are currently looking at a hidden tab, force them back to the dashboard
+            switchTab('dashboard', document.getElementById('nav-dashboard'));
+        }
+    }
         // --- Data Loaders for New Tabs ---
         function loadSalesHistory() {
             fetch('/api/transactions')
@@ -498,12 +535,16 @@
 
         function refreshCartUI(cart) {
             const container = document.getElementById('cart-items');
-            if (!cart.items || cart.items.length === 0) {
-                container.innerHTML = '<p style="color: #a0aec0; text-align: center; font-size: 0.9em;">Cart is empty</p>';
-                document.getElementById('cart-subtotal').innerText = '$0.00';
-                document.getElementById('cart-total').innerText = '$0.00';
-                return;
-            }
+           if (!cart.items || cart.items.length === 0) {
+             container.innerHTML = `
+                 <div style="text-align: center; color: var(--text-muted); margin-top: 30px;">
+                     <i class="fas fa-shopping-basket" style="font-size: 3em; color: #e2e8f0; margin-bottom: 15px;"></i>
+                     <p style="margin: 0; font-size: 0.9em;">Cart is currently empty</p>
+                 </div>`;
+             document.getElementById('cart-subtotal').innerText = '$0.00';
+             document.getElementById('cart-total').innerText = '$0.00';
+             return;
+         }
 
             container.innerHTML = ''; 
             cart.items.forEach(item => {
