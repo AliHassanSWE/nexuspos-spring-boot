@@ -76,9 +76,80 @@
         .grand-total { font-size: 1.4em; font-weight: 800; color: var(--text-dark); margin: 10px 0; display: flex; justify-content: space-between; }
         .btn-checkout { background: var(--accent-green); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: 800; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
         .btn-checkout:hover { background: #27ae60; }
+        /* 1. Startup Loader Screen */
+        #page-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--sidebar-bg); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.6s ease-out, visibility 0.6s;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-green); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 2. Sweeping Glass Shine Effect & Slide Up */
+       .mini-product { 
+            /* 1. Medium Box Size */
+            min-height: 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 8px;
+            
+            /* 2. Standard Aesthetics */
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-align: center; 
+            font-size: 0.85em; 
+            background: white;
+            
+            /* 3. Animation & Shine Boundaries */
+            position: relative; 
+            overflow: hidden; 
+            animation: slideUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            opacity: 0; 
+            transform: translateY(20px);
+        }
+
+        .mini-product:hover { 
+            border-color: var(--accent-green); 
+            background: #f0fdf4; 
+        }
+
+        /* Glass Shine Effect */
+        .mini-product::before {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); transition: all 0.6s ease; z-index: 1;
+        }
+        
+        .mini-product:hover::before {
+            left: 125%;
+        }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* 3. Stagger Dashboard Cards */
+        .stat-card { animation: slideUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
+    <!-- Startup Loading Animation -->
+    <div id="page-loader">
+        <div class="spinner"></div>
+        <h2 style="color: var(--accent-green); margin:0;">NexusPOS</h2>
+        <p style="color: #a8d5cd; font-size: 0.9em; margin-top: 10px;">Initializing Enterprise Environment...</p>
+    </div>
 
     <!-- Left Sidebar with click events -->
     <nav class="sidebar">
@@ -89,6 +160,8 @@
         <div class="nav-item" onclick="switchTab('customers', this)">Customers</div>
         <div class="nav-item" onclick="switchTab('reports', this)">Reports</div>
         <div class="nav-item" onclick="switchTab('settings', this)">Settings</div>
+        <div class="nav-item" onclick="switchTab('about', this)">About</div>
+    </nav>
     </nav>
 
     <!-- Center Content Area -->
@@ -96,9 +169,10 @@
         
         <!-- 1. DASHBOARD TAB -->
         <div id="view-dashboard" class="view-section active">
-            <div class="header">
-                <h1>Today's Overview</h1>
-<p>Welcome back, Ali Hassan! Here's your NexusPOS daily summary.</p>            </div>
+          <div class="header">
+            <h1>Today's Overview</h1>
+            <p>Welcome Back! | Real-time enterprise metrics and point-of-sale analytics.</p>
+        </div>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-title">Total Revenue</div>
@@ -217,6 +291,35 @@
                 </div>
             </div>
         </div>
+<!-- 7. ABOUT TAB -->
+        <div id="view-about" class="view-section">
+            <div class="header">
+                <h1>System Documentation</h1>
+                <p>NexusPOS Operation Guide and Developer Credits.</p>
+            </div>
+            
+            <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); margin-bottom: 20px;">
+                <h3 style="margin-top: 0; color: var(--sidebar-bg);">📖 How to Use NexusPOS</h3>
+                <ul style="line-height: 1.8; color: var(--text-dark);">
+                    <li><strong>Quick Sale (Always Visible):</strong> Use the right-hand panel to search for products. Click any product to add it to the cart. Click "Proceed to Checkout" to finalize the transaction and update database records.</li>
+                    <li><strong>Dashboard:</strong> View live revenue, transaction counts, and a 7-day sales trend graph. Critical low-stock warnings automatically appear here.</li>
+                    <li><strong>Sales:</strong> Review the complete ledger of past receipts. Click 'Print' on any row to generate a physical receipt copy.</li>
+                    <li><strong>Products:</strong> Monitor real-time inventory levels. Badges turn red when stock falls below healthy thresholds.</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--sidebar-bg); padding: 30px; border-radius: 12px; color: white; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0 0 10px 0; color: var(--accent-green);">NexusPOS Architecture</h2>
+                <p style="margin: 0 0 5px 0; font-size: 1.1em;">Engineered & Developed by <strong>Ali Hassan</strong></p>
+                <p style="margin: 0 0 20px 0; color: #a8d5cd; font-size: 0.9em;">Full-Stack Java Enterprise Application</p>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                    <span style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px; font-size: 0.8em;">Spring Boot (MVC)</span>
+                    <span style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px; font-size: 0.8em;">MySQL / JPA</span>
+                    <span style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px; font-size: 0.8em;">Data Structures</span>
+                </div>
+                <p style="margin: 0; font-size: 0.8em; color: #a8d5cd;">&copy; 2026 Ali Hassan  University of Gujrat. All Rights Reserved.</p>
+            </div>
+        </div>
 
     </main>
 
@@ -244,6 +347,14 @@
 
     <script>
         let salesChartInstance = null;
+        // Fade out the startup loader after 0.8 seconds to feel professional
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('page-loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.visibility = 'hidden', 600);
+            }, 800); 
+        });
 
         // --- Tab Switching Logic (SPA) ---
         function switchTab(tabId, element) {
@@ -362,16 +473,18 @@
             });
         }
 
-        function loadProductsForCart() {
+       function loadProductsForCart() {
             fetch('/api/products')
                 .then(res => res.json())
                 .then(products => {
                     const grid = document.getElementById('mini-products');
                     grid.innerHTML = ''; 
-                    products.forEach(p => {
-                        grid.innerHTML += `
-                            <div class="mini-product" onclick="addToCart('${p.id}')">
-                                <div>${p.name}</div>
+                    products.forEach((p, index) => {
+                        // Dynamically delay each card by 0.05 seconds based on its position in the list
+                        const delay = (index * 0.05).toFixed(2);
+                       grid.innerHTML += `
+                            <div class="mini-product" style="animation-delay: ${delay}s" onclick="addToCart('${p.id}')">
+                                <div style="font-weight: 600;">${p.name}</div>
                                 <div class="mini-price">$${p.price.toFixed(2)}</div>
                             </div>
                         `;
