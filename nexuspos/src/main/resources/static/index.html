@@ -141,13 +141,14 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr>
-                            <th>Receipt ID</th>
-                            <th>Date & Time</th>
-                            <th>Total Items</th>
-                            <th>Grand Total</th>
-                        </tr>
-                    </thead>
+    <tr>
+        <th>Receipt ID</th>
+        <th>Date & Time</th>
+        <th>Total Items</th>
+        <th>Grand Total</th>
+        <th>Action</th>
+    </tr>
+</thead>
                     <tbody id="sales-table-body">
                         <!-- Populated by JS -->
                     </tbody>
@@ -274,14 +275,15 @@
                     txs.slice().reverse().forEach(tx => {
                         const date = new Date(tx.timestamp).toLocaleString();
                         const itemCount = tx.purchasedItems.reduce((sum, item) => sum + item.quantity, 0);
-                        tbody.innerHTML += `
-                            <tr>
-                                <td style="font-family: monospace; color: var(--text-muted);">${tx.transactionId}</td>
-                                <td>${date}</td>
-                                <td>${itemCount} items</td>
-                                <td style="font-weight: 800; color: var(--accent-green);">$${tx.grandTotal.toFixed(2)}</td>
-                            </tr>
-                        `;
+                       tbody.innerHTML += `
+    <tr>
+        <td style="font-family: monospace; color: var(--text-muted);">${tx.transactionId}</td>
+        <td>${date}</td>
+        <td>${itemCount} items</td>
+        <td style="font-weight: 800; color: var(--accent-green);">$${tx.grandTotal.toFixed(2)}</td>
+        <td><button onclick="window.print()" style="padding: 6px 12px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🖨️ Print</button></td>
+    </tr>
+`;
                     });
                 });
         }
