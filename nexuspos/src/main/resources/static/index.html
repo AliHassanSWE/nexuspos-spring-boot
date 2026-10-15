@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NexusPOS Dashboard</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>NexusPOS Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -18,7 +18,7 @@
             --accent-green: #2ecc71;
             --danger-red: #e74c3c;
             --warning-yellow: #f1c40f;
-            border-radius: 12px;
+            --border-radius: 12px;
         }
 
         body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg-color); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
@@ -30,13 +30,12 @@
         .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: white; border-left: 4px solid var(--accent-green); }
 
         /* Center Dashboard Area */
-/* Center Dashboard Area */
-    .main-dashboard { 
-        flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; 
-        animation: popUpScale 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-        animation-delay: 0.3s; /* Waits for loader */
-        opacity: 0;
-    }
+        .main-dashboard { 
+            flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; 
+            animation: popUpScale 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
         .header h1 { margin: 0; font-size: 1.8em; }
         .header p { margin: 5px 0 20px 0; color: var(--text-muted); }
 
@@ -70,13 +69,12 @@
         .badge.danger { background: #fee2e2; color: #991b1b; }
 
         /* Right Quick Sale Panel */
-/* Right Quick Sale Panel */
-    .quick-sale { 
-        width: 350px; background: var(--card-bg); border-left: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; 
-        animation: popUpScale 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-        animation-delay: 0.45s; /* Pops up slightly after the dashboard */
-        opacity: 0;
-    }
+        .quick-sale { 
+            width: 350px; background: var(--card-bg); border-left: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; 
+            animation: popUpScale 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            animation-delay: 0.45s;
+            opacity: 0;
+        }
         .search-bar { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: inherit; outline: none; box-sizing: border-box; }
         .mini-product-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; }
         .mini-product { border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.9em; transition: 0.2s; }
@@ -89,6 +87,7 @@
         .grand-total { font-size: 1.4em; font-weight: 800; color: var(--text-dark); margin: 10px 0; display: flex; justify-content: space-between; }
         .btn-checkout { background: var(--accent-green); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: 800; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
         .btn-checkout:hover { background: #27ae60; }
+        
         /* 1. Startup Loader Screen */
         #page-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -105,101 +104,88 @@
 
         /* 2. Sweeping Glass Shine Effect & Slide Up */
        .mini-product { 
-            /* 1. Medium Box Size */
-            min-height: 55px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 4px;
-            padding: 10px 8px;
-            
-            /* 2. Standard Aesthetics */
-            border: 1px solid #e2e8f0; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            text-align: center; 
-            font-size: 0.85em; 
-            background: white;
-            
-            /* 3. Animation & Shine Boundaries */
-            position: relative; 
-            overflow: hidden; 
-            animation: slideUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-            opacity: 0; 
-            transform: translateY(20px);
+            min-height: 55px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; padding: 10px 8px;
+            border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.85em; background: white;
+            position: relative; overflow: hidden; animation: slideUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; opacity: 0; transform: translateY(20px);
         }
-
-        .mini-product:hover { 
-            border-color: var(--accent-green); 
-            background: #f0fdf4; 
-        }
-
-        /* Glass Shine Effect */
+        .mini-product:hover { border-color: var(--accent-green); background: #f0fdf4; }
         .mini-product::before {
-            content: ''; position: absolute; top: 0; left: -100%;
-            width: 50%; height: 100%;
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
             background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
             transform: skewX(-25deg); transition: all 0.6s ease; z-index: 1;
         }
-        
-        .mini-product:hover::before {
-            left: 125%;
-        }
+        .mini-product:hover::before { left: 125%; }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-       /* 3. Stagger Dashboard Cards (Left to Right Cascade) */
-        .stat-card { 
-            animation: slideUp 0.8s ease-out forwards; 
-            opacity: 0; 
-            transform: translateY(30px); 
-        }
-        
-        /* Delays start after the main dashboard pops in */
+       /* 3. Stagger Dashboard Cards */
+        .stat-card { animation: slideUp 0.8s ease-out forwards; opacity: 0; transform: translateY(30px); }
         .stat-card:nth-child(1) { animation-delay: 0.8s; }
         .stat-card:nth-child(2) { animation-delay: 0.95s; }
         .stat-card:nth-child(3) { animation-delay: 1.10s; }
         .stat-card:nth-child(4) { animation-delay: 1.25s; }
-        /* 1. Custom Themed Scrollbars */
+        
+        /* Custom Themed Scrollbars */
      ::-webkit-scrollbar { width: 6px; height: 6px; }
      ::-webkit-scrollbar-track { background: transparent; }
      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
      ::-webkit-scrollbar-thumb:hover { background: var(--sidebar-bg); }
 
-     /* 2. Sidebar Icon Spacing */
+     /* Sidebar Icon Spacing */
      .nav-item i { width: 20px; text-align: center; margin-right: 12px; font-size: 1.1em; }
+     
      /* Full Application Pop-Up Effect */
-    @keyframes popUpScale {
-        0% { opacity: 0; transform: scale(0.92); }
-        100% { opacity: 1; transform: scale(1); }
-    }
-/* Sidebar Staggered Entrance Animation */
-        @keyframes slideInSidebar {
-            0% { opacity: 0; transform: translateX(-20px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
-        
-        /* Increased animation duration to 0.8s */
-        .sidebar h2 { 
-            animation: slideInSidebar 0.8s ease-out forwards; 
-            animation-delay: 0.5s; /* Starts right as the loader fades */
-            opacity: 0; 
-        }
-        
-        .sidebar .nav-item { 
-            animation: slideInSidebar 0.8s ease-out forwards; 
-            opacity: 0; 
-        }
-        
-        /* Increased the gap between each item to 0.15s for a visible cascading effect */
-        .sidebar .nav-item:nth-child(2) { animation-delay: 0.65s; }  /* Dashboard */
-        .sidebar .nav-item:nth-child(3) { animation-delay: 0.80s; }  /* Sales */
-        .sidebar .nav-item:nth-child(4) { animation-delay: 0.95s; }  /* Products */
-        .sidebar .nav-item:nth-child(5) { animation-delay: 1.10s; }  /* Customers */
-        .sidebar .nav-item:nth-child(6) { animation-delay: 1.25s; }  /* Reports */
-        .sidebar .nav-item:nth-child(7) { animation-delay: 1.40s; }  /* Settings */
-        .sidebar .nav-item:nth-child(8) { animation-delay: 1.55s; }  /* About */
+    @keyframes popUpScale { 0% { opacity: 0; transform: scale(0.92); } 100% { opacity: 1; transform: scale(1); } }
     
+    /* Sidebar Staggered Entrance Animation */
+        @keyframes slideInSidebar { 0% { opacity: 0; transform: translateX(-20px); } 100% { opacity: 1; transform: translateX(0); } }
+        .sidebar h2 { animation: slideInSidebar 0.8s ease-out forwards; animation-delay: 0.5s; opacity: 0; }
+        .sidebar .nav-item { animation: slideInSidebar 0.8s ease-out forwards; opacity: 0; }
+        .sidebar .nav-item:nth-child(2) { animation-delay: 0.65s; }
+        .sidebar .nav-item:nth-child(3) { animation-delay: 0.80s; }
+        .sidebar .nav-item:nth-child(4) { animation-delay: 0.95s; }
+        .sidebar .nav-item:nth-child(5) { animation-delay: 1.10s; }
+        .sidebar .nav-item:nth-child(6) { animation-delay: 1.25s; }
+        .sidebar .nav-item:nth-child(7) { animation-delay: 1.40s; }
+        .sidebar .nav-item:nth-child(8) { animation-delay: 1.55s; }
+
+        /* =========================================
+           PROFESSIONAL PRINT RECEIPT CSS
+           ========================================= */
+        #printable-receipt { display: none; }
+        
+        @media print {
+            /* Hide the main application entirely */
+            body > *:not(#printable-receipt) { 
+                display: none !important; 
+            }
+            body { 
+                background: white; 
+                margin: 0; 
+                padding: 0; 
+                align-items: flex-start;
+            }
+            /* Show and format the receipt container */
+            #printable-receipt {
+                display: block !important;
+                width: 80mm; /* Standard thermal roll width */
+                margin: 0 auto;
+                font-family: 'Courier New', Courier, monospace;
+                color: black;
+                padding: 10px;
+                background: white;
+            }
+            .receipt-header { text-align: center; margin-bottom: 15px; }
+            .receipt-header h2 { margin: 0; font-size: 24px; font-weight: bold; font-family: 'Inter', sans-serif; }
+            .receipt-header p { margin: 3px 0; font-size: 12px; color: #333; }
+            .receipt-divider { border-top: 1px dashed black; margin: 12px 0; }
+            .receipt-info p { margin: 4px 0; font-size: 13px; }
+            .receipt-items { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; }
+            .receipt-items th { border-bottom: 1px solid black; padding-bottom: 5px; }
+            .receipt-items th, .receipt-items td { padding: 5px 0; }
+            .receipt-totals { text-align: right; font-size: 14px; }
+            .receipt-totals h3 { font-size: 18px; margin: 8px 0; }
+            .receipt-footer { text-align: center; font-size: 11px; margin-top: 20px; color: #555; }
+        }
     </style>
 </head>
 <body>
@@ -211,7 +197,7 @@
     </div>
 
     <!-- Left Sidebar with click events -->
- <nav class="sidebar">
+    <nav class="sidebar">
         <h2><i class="fas fa-box-open" style="margin-right: 8px;"></i>NexusPOS</h2>
         <div id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
         <div id="nav-sales" class="nav-item" onclick="switchTab('sales', this)"><i class="fas fa-receipt"></i> Sales</div>
@@ -272,14 +258,14 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-    <tr>
-        <th>Receipt ID</th>
-        <th>Date & Time</th>
-        <th>Total Items</th>
-        <th>Grand Total</th>
-        <th>Action</th>
-    </tr>
-</thead>
+                        <tr>
+                            <th>Receipt ID</th>
+                            <th>Date & Time</th>
+                            <th>Total Items</th>
+                            <th>Grand Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
                     <tbody id="sales-table-body">
                         <!-- Populated by JS -->
                     </tbody>
@@ -351,7 +337,7 @@
             </div>
         </div>
     </div>
-<!-- 7. ABOUT TAB -->
+        <!-- 7. ABOUT TAB -->
         <div id="view-about" class="view-section">
             <div class="header">
                 <h1>System Documentation</h1>
@@ -408,8 +394,60 @@
         </div>
     </aside>
 
+    <!-- =========================================
+         PROFESSIONAL RECEIPT TEMPLATE (HIDDEN) 
+         ========================================= -->
+    <div id="printable-receipt">
+        <div class="receipt-header">
+            <h2>NEXUS POS</h2>
+            <p>123 Business Avenue</p>
+            <p>Contact: +92 300 1234567</p>
+            <p style="margin-top: 10px;"><strong>TAX INVOICE / RECEIPT</strong></p>
+        </div>
+        
+        <div class="receipt-info">
+            <p><strong>Receipt #:</strong> <span id="rec-id"></span></p>
+            <p><strong>Date:</strong> <span id="rec-date"></span></p>
+            <p><strong>Cashier:</strong> <span id="rec-cashier"></span></p>
+        </div>
+        
+        <div class="receipt-divider"></div>
+        
+        <table class="receipt-items">
+            <thead>
+                <tr>
+                    <th style="text-align: left; width: 45%;">Item</th>
+                    <th style="text-align: center; width: 15%;">Qty</th>
+                    <th style="text-align: right; width: 20%;">Price</th>
+                    <th style="text-align: right; width: 20%;">Total</th>
+                </tr>
+            </thead>
+            <tbody id="rec-items-body">
+                <!-- Dynamically populated by JS -->
+            </tbody>
+        </table>
+        
+        <div class="receipt-divider"></div>
+        
+        <div class="receipt-totals">
+            <p style="color: #555;">Subtotal: <span id="rec-subtotal"></span></p>
+            <p style="color: #555;">Tax (0%): <span>$0.00</span></p>
+            <h3>Grand Total: <span id="rec-total"></span></h3>
+        </div>
+        
+        <div class="receipt-divider"></div>
+        
+        <div class="receipt-footer">
+            <p style="font-weight: bold; font-size: 13px;">Thank you for your purchase!</p>
+            <p>Returns accepted within 14 days with receipt.</p>
+            <p style="margin-top: 15px;">System engineered by Ali Hassan</p>
+        </div>
+    </div>
+
     <script>
         let salesChartInstance = null;
+        let globalTransactions = []; // Store transactions to allow detailed printing
+
         // Fade out the startup loader after 0.8 seconds to feel professional
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -421,68 +459,112 @@
 
         // --- Tab Switching Logic (SPA) ---
         function switchTab(tabId, element) {
-            // Highlight sidebar tab
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            // Hide all views and show selected one
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabId).classList.add('active');
 
-            // Fetch fresh data when tab is opened
             if(tabId === 'sales') loadSalesHistory();
             if(tabId === 'products') loadProductTable();
         }
-let isAdmin = true;
 
-    function toggleRole() {
-        isAdmin = !isAdmin;
-        const profileText = document.getElementById('profile-text');
-        const roleBtn = document.getElementById('role-btn');
-        
-        const productsTab = document.getElementById('nav-products');
-        const reportsTab = document.getElementById('nav-reports');
-        
-        if(isAdmin) {
-            profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong>';
-            roleBtn.innerText = 'Switch to Cashier';
-            productsTab.style.display = 'block';
-            reportsTab.style.display = 'block';
-        } else {
-            profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Guest (Cashier)</strong>';
-            roleBtn.innerText = 'Switch to Admin';
-            productsTab.style.display = 'none';
-            reportsTab.style.display = 'none';
+        let isAdmin = true;
+
+        function toggleRole() {
+            isAdmin = !isAdmin;
+            const profileText = document.getElementById('profile-text');
+            const roleBtn = document.getElementById('role-btn');
+            const productsTab = document.getElementById('nav-products');
+            const reportsTab = document.getElementById('nav-reports');
             
-            // If they are currently looking at a hidden tab, force them back to the dashboard
-            switchTab('dashboard', document.getElementById('nav-dashboard'));
+            if(isAdmin) {
+                profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong>';
+                roleBtn.innerText = 'Switch to Cashier';
+                productsTab.style.display = 'block';
+                reportsTab.style.display = 'block';
+            } else {
+                profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Guest (Cashier)</strong>';
+                roleBtn.innerText = 'Switch to Admin';
+                productsTab.style.display = 'none';
+                reportsTab.style.display = 'none';
+                
+                if (document.getElementById('view-products').classList.contains('active') || 
+                    document.getElementById('view-reports').classList.contains('active')) {
+                    switchTab('dashboard', document.getElementById('nav-dashboard'));
+                }
+            }
         }
-    }
+
         // --- Data Loaders for New Tabs ---
         function loadSalesHistory() {
             fetch('/api/transactions')
                 .then(res => res.json())
                 .then(txs => {
+                    globalTransactions = txs; // Save to global array for the print function
                     const tbody = document.getElementById('sales-table-body');
                     tbody.innerHTML = '';
                     if(txs.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No transactions found.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No transactions found.</td></tr>';
                         return;
                     }
                     txs.slice().reverse().forEach(tx => {
                         const date = new Date(tx.timestamp).toLocaleString();
                         const itemCount = tx.purchasedItems.reduce((sum, item) => sum + item.quantity, 0);
-                       tbody.innerHTML += `
-    <tr>
-        <td style="font-family: monospace; color: var(--text-muted);">${tx.transactionId}</td>
-        <td>${date}</td>
-        <td>${itemCount} items</td>
-        <td style="font-weight: 800; color: var(--accent-green);">$${tx.grandTotal.toFixed(2)}</td>
-        <td><button onclick="window.print()" style="padding: 6px 12px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🖨️ Print</button></td>
-    </tr>
-`;
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-family: monospace; color: var(--text-muted);">${tx.transactionId}</td>
+                                <td>${date}</td>
+                                <td>${itemCount} items</td>
+                                <td style="font-weight: 800; color: var(--accent-green);">$${tx.grandTotal.toFixed(2)}</td>
+                                <td><button onclick="printProfessionalReceipt('${tx.transactionId}')" style="padding: 6px 12px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: var(--sidebar-bg); transition: 0.2s;">🖨️ Print</button></td>
+                            </tr>
+                        `;
                     });
                 });
+        }
+
+        // --- NEW PROFESSIONAL PRINT FUNCTION ---
+        function printProfessionalReceipt(transactionId) {
+            // Find the specific transaction from our global array
+            const tx = globalTransactions.find(t => t.transactionId === transactionId);
+            if (!tx) {
+                alert("Transaction details not found!");
+                return;
+            }
+
+            // 1. Populate Header Information
+            document.getElementById('rec-id').innerText = tx.transactionId.substring(0, 8).toUpperCase();
+            document.getElementById('rec-date').innerText = new Date(tx.timestamp).toLocaleString();
+            document.getElementById('rec-cashier').innerText = isAdmin ? 'Ali Hassan' : 'Guest Cashier';
+
+            // 2. Clear and Populate Individual Items
+            const itemsBody = document.getElementById('rec-items-body');
+            itemsBody.innerHTML = '';
+            
+            tx.purchasedItems.forEach(item => {
+                // Safely grab the product name and calculate prices based on backend schema
+                const name = item.product ? item.product.name : (item.productName || 'Retail Item');
+                const qty = item.quantity || 1;
+                const lineTotal = item.subtotal || (item.price * qty) || 0;
+                const unitPrice = item.price || (lineTotal / qty) || 0;
+
+                itemsBody.innerHTML += `
+                    <tr>
+                        <td style="text-align: left;">${name}</td>
+                        <td style="text-align: center;">${qty}</td>
+                        <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
+                        <td style="text-align: right; font-weight: bold;">$${lineTotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            // 3. Populate Totals
+            document.getElementById('rec-subtotal').innerText = '$' + tx.grandTotal.toFixed(2);
+            document.getElementById('rec-total').innerText = '$' + tx.grandTotal.toFixed(2);
+
+            // 4. Trigger the print dialog (CSS @media print takes over here)
+            window.print();
         }
 
         function loadProductTable() {
@@ -495,7 +577,7 @@ let isAdmin = true;
                         const badgeClass = p.stockQuantity < 10 ? 'badge danger' : 'badge good';
                         tbody.innerHTML += `
                             <tr>
-                                <td style="font-family: monospace; color: var(--text-muted);">${p.id}</td>
+                                <td style="font-family: monospace; color: var(--text-muted);">${p.id || 'N/A'}</td>
                                 <td style="font-weight: 600;">${p.name}</td>
                                 <td><span class="${badgeClass}">${p.stockQuantity} in stock</span></td>
                                 <td style="font-weight: 600;">$${p.price.toFixed(2)}</td>
@@ -556,32 +638,30 @@ let isAdmin = true;
                         fill: true
                     }]
                 },
-options: {
+                options: {
                     responsive: true,
                     animation: {
-                        duration: 2000, // 2 seconds to draw the line
-                        easing: 'easeOutQuart' // Smooth deceleration
+                        duration: 2000, 
+                        easing: 'easeOutQuart'
                     },
                     plugins: { legend: { display: false } },
                     scales: { 
                         y: { beginAtZero: true, border: {display: false} },
                         x: { grid: {display: false} }
                     }
-                    
                 }
             });
         }
 
-       function loadProductsForCart() {
+        function loadProductsForCart() {
             fetch('/api/products')
                 .then(res => res.json())
                 .then(products => {
                     const grid = document.getElementById('mini-products');
                     grid.innerHTML = ''; 
                     products.forEach((p, index) => {
-                        // Dynamically delay each card by 0.05 seconds based on its position in the list
                         const delay = (index * 0.05).toFixed(2);
-                       grid.innerHTML += `
+                        grid.innerHTML += `
                             <div class="mini-product" style="animation-delay: ${delay}s" onclick="addToCart('${p.id}')">
                                 <div style="font-weight: 600;">${p.name}</div>
                                 <div class="mini-price">$${p.price.toFixed(2)}</div>
@@ -597,16 +677,16 @@ options: {
 
         function refreshCartUI(cart) {
             const container = document.getElementById('cart-items');
-           if (!cart.items || cart.items.length === 0) {
-             container.innerHTML = `
-                 <div style="text-align: center; color: var(--text-muted); margin-top: 30px;">
-                     <i class="fas fa-shopping-basket" style="font-size: 3em; color: #e2e8f0; margin-bottom: 15px;"></i>
-                     <p style="margin: 0; font-size: 0.9em;">Cart is currently empty</p>
-                 </div>`;
-             document.getElementById('cart-subtotal').innerText = '$0.00';
-             document.getElementById('cart-total').innerText = '$0.00';
-             return;
-         }
+            if (!cart.items || cart.items.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); margin-top: 30px;">
+                        <i class="fas fa-shopping-basket" style="font-size: 3em; color: #e2e8f0; margin-bottom: 15px;"></i>
+                        <p style="margin: 0; font-size: 0.9em;">Cart is currently empty</p>
+                    </div>`;
+                document.getElementById('cart-subtotal').innerText = '$0.00';
+                document.getElementById('cart-total').innerText = '$0.00';
+                return;
+            }
 
             container.innerHTML = ''; 
             cart.items.forEach(item => {
@@ -632,7 +712,6 @@ options: {
                     fetch('/api/cart').then(r => r.json()).then(c => refreshCartUI(c));
                     loadProductsForCart(); 
                     loadDashboardStats(); 
-                    // Refresh data tables if they are currently open
                     if (document.getElementById('view-products').classList.contains('active')) loadProductTable();
                     if (document.getElementById('view-sales').classList.contains('active')) loadSalesHistory();
                 });
@@ -643,7 +722,7 @@ options: {
             const productCards = document.getElementsByClassName('mini-product');
             for (let i = 0; i < productCards.length; i++) {
                 const productName = productCards[i].firstElementChild.innerText.toLowerCase();
-                if (productName.includes(query)) productCards[i].style.display = "block";
+                if (productName.includes(query)) productCards[i].style.display = "flex";
                 else productCards[i].style.display = "none";
             }
         }
