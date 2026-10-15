@@ -324,6 +324,16 @@ body.cashier-mode .admin-only {
                 <h2 style="color: var(--text-dark);">📄 Reports Engine</h2>
                 <p>PDF Export and Custom Date Ranges will appear here.</p>
             </div>
+            <!-- Administrator Inbox (Visible Only to Admin via Reports Tab) -->
+<div style="background: white; padding: 30px; border-radius: 12px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: left;">
+    <h3 style="margin-top: 0; color: var(--text-dark);">
+        <i class="fas fa-inbox" style="color: var(--sidebar-bg); margin-right: 8px;"></i>
+        Administrator Inbox (User Reports & Suggestions)
+    </h3>
+    <div id="admin-feedback-inbox" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+        <p style="color: var(--text-muted); font-size: 0.9em;">No reports or suggestions have been submitted yet.</p>
+    </div>
+</div>
         </div>
 
         <!-- 6. SETTINGS TAB -->
@@ -342,6 +352,20 @@ body.cashier-mode .admin-only {
                 <button onclick="alert('You have successfully logged out.')" style="background: #fee2e2; color: #991b1b; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Log Out</button>
             </div>
         </div>
+        <!-- Report a Problem / Suggestion Form (Visible to Everyone) -->
+<div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); margin-top: 20px;">
+    <h3 style="margin-top: 0;">
+        <i class="fas fa-comment-dots" style="color: var(--accent-green); margin-right: 8px;"></i>
+        Report a Problem / Suggestion
+    </h3>
+    <p style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 15px;">Send a message, report a system issue, or suggest a feature to the Administrator.</p>
+    
+    <textarea id="user-feedback-text" rows="3" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; resize: vertical; box-sizing: border-box; outline: none;" placeholder="Type your problem or suggestion here..."></textarea>
+    
+    <button onclick="submitProblemOrSuggestion()" style="margin-top: 15px; background: var(--sidebar-bg); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;">
+        Send to Administrator
+    </button>
+</div>
     </div>
         <!-- 7. ABOUT TAB -->
         <div id="view-about" class="view-section">
@@ -477,24 +501,33 @@ body.cashier-mode .admin-only {
 
         let isAdmin = true;
 
-       function toggleRole() {
+    function toggleRole() {
     isAdmin = !isAdmin;
     const profileText = document.getElementById('profile-text');
     const roleBtn = document.getElementById('role-btn');
+    const productsTab = document.getElementById('nav-products');
     const reportsTab = document.getElementById('nav-reports');
+    const salesTab = document.getElementById('nav-sales'); // Added Sales Tab variable
     
     if(isAdmin) {
         document.body.classList.remove('cashier-mode');
         profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong>';
         roleBtn.innerText = 'Switch to Cashier';
+        productsTab.style.display = 'block';
         reportsTab.style.display = 'block';
+        salesTab.style.display = 'block'; // Show Sales for Admin
     } else {
         document.body.classList.add('cashier-mode');
         profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Guest (Cashier)</strong>';
         roleBtn.innerText = 'Switch to Admin';
+        productsTab.style.display = 'none';
         reportsTab.style.display = 'none';
+        salesTab.style.display = 'none'; // Hide Sales for Cashier
         
-        if (document.getElementById('view-reports').classList.contains('active')) {
+        // Redirect to dashboard if they are viewing a hidden tab
+        if (document.getElementById('view-products').classList.contains('active') || 
+            document.getElementById('view-reports').classList.contains('active') ||
+            document.getElementById('view-sales').classList.contains('active')) { // Check Sales tab
             switchTab('dashboard', document.getElementById('nav-dashboard'));
         }
     }
@@ -754,6 +787,58 @@ function addStock(productId) {
             })
             .catch(err => alert("Network error: Check your connection."));
     }
+}
+// Array to store messages temporarily
+let feedbackMessages = [];
+
+// 1. Function for Cashiers/Users to send a message
+function submitProblemOrSuggestion() {
+    const textBox = document.getElementById('user-feedback-text');
+    const message = textBox.value.trim();
+    
+    if (message === "") {
+        alert("Please write a problem or suggestion before sending.");
+        return;
+    }
+    
+    // Detect who is sending the message based on current role
+    const sender = isAdmin ? "Ali Hassan (Admin)" : "Guest (Cashier)";
+    const date = new Date().toLocaleString();
+    
+    // Save the message
+    feedbackMessages.push({ sender, date, message });
+    
+    alert("✅ Thank you! Your problem/suggestion has been sent to the Administrator.");
+    textBox.value = ""; // Clear the box
+    
+    // Update the Admin Inbox in the background
+    renderFeedbackInbox(); 
+}
+
+// 2. Function to display messages in the Admin Inbox
+function renderFeedbackInbox() {
+    const inbox = document.getElementById('admin-feedback-inbox');
+    if (!inbox) return;
+    
+    if (feedbackMessages.length === 0) {
+        inbox.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9em;">No reports or suggestions have been submitted yet.</p>';
+        return;
+    }
+    
+    inbox.innerHTML = ''; // Clear empty message text
+    
+    // Loop through messages (newest first) and display them
+    feedbackMessages.slice().reverse().forEach(fb => {
+        inbox.innerHTML += `
+            <div style="border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; background: #f8fafc;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85em; color: var(--text-muted);">
+                    <strong style="color: var(--sidebar-bg);">${fb.sender}</strong>
+                    <span>${fb.date}</span>
+                </div>
+                <div style="font-size: 0.95em; color: var(--text-dark); line-height: 1.5;">${fb.message}</div>
+            </div>
+        `;
+    });
 }
 
     </script>
