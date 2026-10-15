@@ -186,6 +186,11 @@
             .receipt-totals h3 { font-size: 18px; margin: 8px 0; }
             .receipt-footer { text-align: center; font-size: 11px; margin-top: 20px; color: #555; }
         }
+/* Hide admin features when Cashier mode is active */
+body.cashier-mode .admin-only {
+    display: none !important;
+}
+
     </style>
 </head>
 <body>
@@ -282,13 +287,14 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr>
-                            <th>Barcode ID</th>
-                            <th>Product Name</th>
-                            <th>Stock Status</th>
-                            <th>Unit Price</th>
-                        </tr>
-                    </thead>
+    <tr>
+        <th>Barcode ID</th>
+        <th>Product Name</th>
+        <th>Stock Status</th>
+        <th>Unit Price</th>
+        <th class="admin-only">Action</th> 
+    </tr>
+</thead>
                     <tbody id="products-table-body">
                         <!-- Populated by JS -->
                     </tbody>
@@ -471,31 +477,28 @@
 
         let isAdmin = true;
 
-        function toggleRole() {
-            isAdmin = !isAdmin;
-            const profileText = document.getElementById('profile-text');
-            const roleBtn = document.getElementById('role-btn');
-            const productsTab = document.getElementById('nav-products');
-            const reportsTab = document.getElementById('nav-reports');
-            
-            if(isAdmin) {
-                profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong>';
-                roleBtn.innerText = 'Switch to Cashier';
-                productsTab.style.display = 'block';
-                reportsTab.style.display = 'block';
-            } else {
-                profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Guest (Cashier)</strong>';
-                roleBtn.innerText = 'Switch to Admin';
-                productsTab.style.display = 'none';
-                reportsTab.style.display = 'none';
-                
-                if (document.getElementById('view-products').classList.contains('active') || 
-                    document.getElementById('view-reports').classList.contains('active')) {
-                    switchTab('dashboard', document.getElementById('nav-dashboard'));
-                }
-            }
+       function toggleRole() {
+    isAdmin = !isAdmin;
+    const profileText = document.getElementById('profile-text');
+    const roleBtn = document.getElementById('role-btn');
+    const reportsTab = document.getElementById('nav-reports');
+    
+    if(isAdmin) {
+        document.body.classList.remove('cashier-mode');
+        profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Ali Hassan (System Administrator)</strong>';
+        roleBtn.innerText = 'Switch to Cashier';
+        reportsTab.style.display = 'block';
+    } else {
+        document.body.classList.add('cashier-mode');
+        profileText.innerHTML = 'Logged in as: <strong style="color: var(--text-dark);">Guest (Cashier)</strong>';
+        roleBtn.innerText = 'Switch to Admin';
+        reportsTab.style.display = 'none';
+        
+        if (document.getElementById('view-reports').classList.contains('active')) {
+            switchTab('dashboard', document.getElementById('nav-dashboard'));
         }
-
+    }
+}
         // --- Data Loaders for New Tabs ---
         function loadSalesHistory() {
             fetch('/api/transactions')
@@ -567,26 +570,28 @@
             window.print();
         }
 
-        function loadProductTable() {
-            fetch('/api/products')
-                .then(res => res.json())
-                .then(products => {
-                    const tbody = document.getElementById('products-table-body');
-                    tbody.innerHTML = '';
-                    products.forEach(p => {
-                        const badgeClass = p.stockQuantity < 10 ? 'badge danger' : 'badge good';
-                        tbody.innerHTML += `
-                            <tr>
-                                <td style="font-family: monospace; color: var(--text-muted);">${p.id || 'N/A'}</td>
-                                <td style="font-weight: 600;">${p.name}</td>
-                                <td><span class="${badgeClass}">${p.stockQuantity} in stock</span></td>
-                                <td style="font-weight: 600;">$${p.price.toFixed(2)}</td>
-                            </tr>
-                        `;
-                    });
-                });
-        }
-
+       function loadProductTable() {
+    fetch('/api/products')
+        .then(res => res.json())
+        .then(products => {
+            const tbody = document.getElementById('products-table-body');
+            tbody.innerHTML = '';
+            products.forEach(p => {
+                const badgeClass = p.stockQuantity < 10 ? 'badge danger' : 'badge good';
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-family: monospace; color: var(--text-muted);">${p.id || 'N/A'}</td>
+                        <td style="font-weight: 600;">${p.name}</td>
+                        <td><span class="${badgeClass}">${p.stockQuantity} in stock</span></td>
+                        <td style="font-weight: 600;">$${p.price.toFixed(2)}</td>
+                        <td class="admin-only">
+                            <button onclick="addStock('${p.id}')" style="padding: 6px 12px; background: var(--sidebar-bg); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ Add</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+}
         // --- Existing POS Functions ---
         function loadDashboardStats() {
             fetch('/api/dashboard/stats')
@@ -732,6 +737,25 @@
         loadProductsForCart();
         fetch('/api/cart').then(r => r.json()).then(c => refreshCartUI(c));
         loadDashboardStats();
+function addStock(productId) {
+    if (!isAdmin) return; // Hard block for cashiers
+    
+    const amount = prompt("Enter quantity of new stock to add:");
+    if (amount !== null && amount.trim() !== "" && !isNaN(amount) && parseInt(amount) > 0) {
+        fetch(`/api/products/${productId}/addStock?quantity=${parseInt(amount)}`, { method: 'POST' })
+            .then(res => {
+                if (res.ok) {
+                    loadProductTable();
+                    loadProductsForCart();
+                    loadDashboardStats();
+                } else {
+                    alert("Error: Could not update stock in the database.");
+                }
+            })
+            .catch(err => alert("Network error: Check your connection."));
+    }
+}
+
     </script>
 </body>
 </html>

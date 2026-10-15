@@ -26,6 +26,9 @@ public class Product {
     public String getId() { return id; }
     public String getName() { return name; }
     public double getPrice() { return price; }
+    public void setStockQuantity(int stockQuantity) {
+    this.stockQuantity = stockQuantity;
+}
     public int getStockQuantity() { return stockQuantity; }
 
     public void reduceStock(int quantity) {
